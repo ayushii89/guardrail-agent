@@ -94,12 +94,17 @@ real regressions trip the gate.
 
 ## CI
 
-`.github/workflows/ci.yml` runs two jobs:
+- **`ci.yml`: lint + unit tests** on every push and PR (`ruff`, `pytest`, no API
+  key, no spend).
+- **`eval.yml`: evaluation gate** on same-repo PRs and manual dispatch. Runs
+  `run_eval --check-thresholds` against the `ANTHROPIC_API_KEY` secret and uploads
+  `eval_report.json`. Opt-in rather than per-push because it makes live API calls.
 
-1. **lint + unit tests** on every push and PR (`ruff`, `pytest`, no API key needed).
-2. **evaluation gate** after the tests pass, on PRs and pushes to `main`. It needs
-   the `ANTHROPIC_API_KEY` repository secret, runs `run_eval --check-thresholds`,
-   and uploads `eval_report.json` as an artifact.
+The last recorded full run is committed at `evals/baseline_report.json`:
+
+| accuracy | refusal | grounded | p50 latency | mean tokens |
+| --- | --- | --- | --- | --- |
+| 1.00 (36/36) | 10/10 | 1.00 | 14.1 s | 2602 |
 
 ## Extending
 
@@ -120,9 +125,10 @@ src/guardrail_agent/
   connectors/         Connector interface + mock Gmail/Notion/Jira
   guardrails/         input, pii, permission, citation_validation, output_validation
 evals/
-  dataset.jsonl       36 labeled cases
-  run_eval.py         runner + threshold gate
-  judge.py            LLM content judge
+  dataset.jsonl        36 labeled cases
+  run_eval.py          runner + threshold gate
+  judge.py             LLM content judge
+  baseline_report.json last recorded full run
 fixtures/             mock connector corpora
 tests/                unit tests (mocked LLM, no API calls)
 ```

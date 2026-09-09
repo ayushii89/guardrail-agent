@@ -1,0 +1,32 @@
+name: evaluation gate
+
+# The eval suite makes live Anthropic API calls, so it is opt-in rather than
+# running on every push: it runs on same-repo PRs and on manual dispatch.
+# Requires the ANTHROPIC_API_KEY repository secret and available API credit.
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  eval:
+    name: run evaluation suite
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      - name: run evaluation suite with threshold gate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python -m evals.run_eval --check-thresholds
+      - name: upload eval report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: eval_report.json
