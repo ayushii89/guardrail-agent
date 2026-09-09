@@ -26,10 +26,10 @@ def validate_citations(
 
     ev_by_n = {i: e for i, e in enumerate(answer.evidence, start=1)}
 
-    # An explicit "no evidence" claim with no citations is allowed through.
-    def _is_no_evidence(text: str) -> bool:
-        t = text.lower()
-        return ("no evidence" in t) or ("does not" in t and "answer" in t)
+    # An explicit abstention (the model said the evidence does not answer the
+    # question) carries no citations by design and is allowed straight through.
+    if all(c.is_abstention for c in answer.claims):
+        return answer, GuardrailResult(stage=Stage.CITATION_VALIDATION, allowed=True), (0, 0)
 
     payload_lines = []
     for idx, claim in enumerate(answer.claims):
@@ -53,10 +53,12 @@ def validate_citations(
 
     kept, dropped = [], []
     for idx, claim in enumerate(answer.claims):
+        if claim.is_abstention:
+            kept.append(claim)
+            continue
         has_valid_citation = any(n in ev_by_n for n in claim.citations)
         supported = verdicts.get(idx, has_valid_citation)
-        no_evidence_claim = not claim.citations and _is_no_evidence(claim.text)
-        if (has_valid_citation and supported) or no_evidence_claim:
+        if has_valid_citation and supported:
             kept.append(claim)
         else:
             dropped.append(claim.text)

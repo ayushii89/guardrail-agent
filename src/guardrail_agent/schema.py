@@ -55,6 +55,11 @@ class Decomposition(BaseModel):
 class Claim(BaseModel):
     text: str
     citations: list[int] = Field(default_factory=list)
+    kind: str = "assertion"  # "assertion" | "abstention"
+
+    @property
+    def is_abstention(self) -> bool:
+        return self.kind == "abstention"
 
 
 class AgentAnswer(BaseModel):

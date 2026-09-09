@@ -26,9 +26,7 @@ def validate_output(answer: AgentAnswer) -> tuple[AgentAnswer, GuardrailResult]:
         )
 
     ungrounded = [
-        c.text
-        for c in answer.claims
-        if not c.citations and "no evidence" not in c.text.lower()
+        c.text for c in answer.claims if not c.citations and not c.is_abstention
     ]
     if ungrounded:
         policies.append("ungrounded_claim")

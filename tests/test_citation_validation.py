@@ -51,7 +51,9 @@ def test_keeps_explicit_no_evidence_claim(monkeypatch):
         "guardrail_agent.guardrails.citation_validation.complete_json",
         lambda **_: ({"verdicts": []}, (0, 0)),
     )
-    ans = _answer([Claim(text="No evidence was found to answer this question.", citations=[])])
+    ans = _answer(
+        [Claim(text="The evidence does not answer this.", citations=[], kind="abstention")]
+    )
     new_ans, res, _ = validate_citations(ans)
     assert len(new_ans.claims) == 1
     assert res.allowed

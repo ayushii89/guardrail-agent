@@ -45,7 +45,7 @@ def test_no_evidence_says_so(fake_llm):
     assert not trace.refused
     assert trace.answer.claims
     assert trace.answer.claims[0].citations == []
-    assert "no evidence" in trace.answer.claims[0].text.lower()
+    assert trace.answer.claims[0].is_abstention
 
 
 def test_injection_is_refused_before_any_llm_call(fake_llm):
