@@ -76,6 +76,7 @@ class AgentTrace(BaseModel):
     refused: bool = False
     refusal_reason: str = ""
     needs_confirmation: bool = False
+    tool_errors: list[str] = Field(default_factory=list)
     guardrails: list[GuardrailResult] = Field(default_factory=list)
     decomposition: Decomposition | None = None
     answer: AgentAnswer | None = None
