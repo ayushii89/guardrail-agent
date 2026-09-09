@@ -6,23 +6,12 @@ that passes it goes to a small classifier model. Any error fails closed (blocked
 
 from __future__ import annotations
 
-import re
-
 from guardrail_agent.client import ModelResponseError, complete_json
 from guardrail_agent.config import SETTINGS
+from guardrail_agent.guardrails.patterns import INJECTION_PATTERNS
 from guardrail_agent.schema import GuardrailResult, Stage
 
-_INJECTION_PATTERNS = [
-    re.compile(
-        r"ignore (?:all |any |the )?(?:previous|prior|above) (?:instructions|prompts)", re.I
-    ),
-    re.compile(r"disregard (?:the |your )?(?:system prompt|instructions|rules)", re.I),
-    re.compile(r"you are now (?:a |an )?(?:dan|developer mode|unrestricted)", re.I),
-    re.compile(
-        r"(?:reveal|print|repeat|show) (?:your |the )?(?:system prompt|instructions)", re.I
-    ),
-    re.compile(r"pretend (?:you are|to be) (?:not |un)", re.I),
-]
+_INJECTION_PATTERNS = INJECTION_PATTERNS
 
 _SYSTEM = f"""You are an input guardrail for an internal project-status assistant.
 

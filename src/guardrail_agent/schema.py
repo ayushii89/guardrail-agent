@@ -11,6 +11,7 @@ class Stage(str, Enum):
     INPUT_GUARDRAIL = "input_guardrail"
     DECOMPOSE = "decompose"
     RETRIEVE = "retrieve"
+    EVIDENCE_SCAN = "evidence_scan"
     PII_REDACTION = "pii_redaction"
     SYNTHESIZE = "synthesize"
     CITATION_VALIDATION = "citation_validation"
@@ -42,6 +43,7 @@ class Evidence(BaseModel):
     text: str
     url: str = ""
     redacted: bool = False
+    sanitized: bool = False  # instruction-like content was stripped from this snippet
 
 
 class SubQuestion(BaseModel):

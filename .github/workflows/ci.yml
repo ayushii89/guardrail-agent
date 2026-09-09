@@ -27,3 +27,11 @@ jobs:
         env:
           GUARDRAIL_OFFLINE: "1"
         run: python -m evals.run_eval
+      - name: render eval dashboard
+        run: python -m evals.report_html eval_report.json -o eval_report.html
+      - name: upload eval dashboard
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-dashboard-offline
+          path: eval_report.html

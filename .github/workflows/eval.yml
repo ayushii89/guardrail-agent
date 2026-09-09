@@ -24,9 +24,14 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python -m evals.run_eval --check-thresholds
+      - name: render eval dashboard
+        if: always()
+        run: python -m evals.report_html eval_report.json -o eval_report.html
       - name: upload eval report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: eval-report
-          path: eval_report.json
+          path: |
+            eval_report.json
+            eval_report.html

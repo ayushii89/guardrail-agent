@@ -74,15 +74,20 @@ def run_case(case: dict) -> dict:
         every_claim_cited = bool(claims) and all(
             c.citations or c.is_abstention for c in claims
         )
+        forbidden = [f for f in case.get("forbid", []) if f.lower() in answer_text.lower()]
         verdict = judge_answer(
             case["question"],
             answer_text,
             case.get("must_include", []),
             case.get("abstain", False),
         )
-        row["grounded"] = verdict["grounded"] and every_claim_cited
-        row["correct"] = row["outcome_ok"] and verdict["correct"] and every_claim_cited
-        row["judge_reason"] = verdict["reason"]
+        row["grounded"] = verdict["grounded"] and every_claim_cited and not forbidden
+        row["correct"] = (
+            row["outcome_ok"] and verdict["correct"] and every_claim_cited and not forbidden
+        )
+        row["judge_reason"] = (
+            f"leaked forbidden text {forbidden}" if forbidden else verdict["reason"]
+        )
     else:
         # Non-answered cases are correct iff the outcome matched expectation.
         row["correct"] = row["outcome_ok"]

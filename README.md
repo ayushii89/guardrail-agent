@@ -7,7 +7,7 @@ A guardrailed agentic RAG system with an evaluation suite gated in CI.
 
 Given a question about internal project status, the agent decomposes it, gathers
 cited evidence from mock Gmail / Notion / Jira connectors, and passes every stage
-through a guardrail. A 36-case evaluation suite runs on every change and blocks
+through a guardrail. A 38-case evaluation suite runs on every change and blocks
 the build when quality regresses.
 
 > Gmail and Jira are mock adapters backed by JSON fixtures in `fixtures/`. **Notion
@@ -27,17 +27,39 @@ Or run it locally: `GUARDRAIL_OFFLINE=1 streamlit run app.py`
 
 ## Pipeline
 
+```mermaid
+flowchart TD
+    Q[User question] --> IG{{Input guardrail}}
+    IG -->|blocked| R1[Refuse]
+    IG --> PM{{Permission layer}}
+    PM -->|action request| R2[Needs confirmation]
+    PM --> D[Decompose]
+    D --> RT[Retrieve]
+    RT --> G[(Gmail<br/>fixture)]
+    RT --> N[(Notion<br/>live API)]
+    RT --> J[(Jira<br/>fixture)]
+    G & N & J --> ES{{Evidence scan}}
+    ES --> PII{{PII redaction}}
+    PII --> S[Synthesize]
+    S --> CV{{Citation validation}}
+    CV --> OV{{Output validation}}
+    OV -->|blocked| R3[Refuse]
+    OV --> A[Cited answer]
+
+    classDef guard fill:#0d3b34,stroke:#2dd4bf,color:#e6edf3;
+    class IG,PM,ES,PII,CV,OV guard;
 ```
-question
-  -> input guardrail      regex prefilter + classifier; blocks injection / jailbreak / off-topic (fail-closed)
-  -> permission layer      read-only agent; a request to take an action needs human confirmation
-  -> decompose             LLM splits the question into focused sub-questions
-  -> retrieve              route each sub-question to Gmail / Notion / Jira; connector errors are tolerated
-  -> PII redaction         deterministic regex; runs before evidence reaches the model
-  -> synthesize            LLM answer using only the numbered evidence; abstains when it cannot answer
-  -> citation validation   LLM judge drops any claim not entailed by its cited evidence (fail-closed)
-  -> output validation     blocks empty / ungrounded answers; redacts any PII that slipped through
-```
+
+Guardrail stages (`{{ }}` above) in order:
+
+| Stage | What it does |
+| --- | --- |
+| Input guardrail | Regex prefilter + classifier; blocks injection / jailbreak / off-topic. Fail-closed. |
+| Permission layer | Read-only agent; a request to take an action returns `needs_confirmation`. |
+| Evidence scan | Strips instruction-like text from retrieved documents (indirect prompt injection). |
+| PII redaction | Deterministic regex over evidence before it reaches the model, and over the final answer. |
+| Citation validation | LLM judge drops any claim not entailed by its cited evidence. Fail-closed. |
+| Output validation | Blocks empty / ungrounded answers; redacts any PII that slipped through. |
 
 Every run returns an `AgentTrace` with each guardrail verdict, the decomposition,
 the cited answer, and token / latency cost.
@@ -136,8 +158,12 @@ real regressions trip the gate.
 - **`ci.yml`: lint + unit tests + offline eval smoke** on every push and PR
   (`ruff`, `pytest`, and a full `run_eval` in offline mode). No API key, no spend.
 - **`eval.yml`: evaluation gate** on same-repo PRs and manual dispatch. Runs
-  `run_eval --check-thresholds` against the `ANTHROPIC_API_KEY` secret and uploads
-  `eval_report.json`. Opt-in rather than per-push because it makes live API calls.
+  `run_eval --check-thresholds` against the `ANTHROPIC_API_KEY` secret. Opt-in
+  rather than per-push because it makes live API calls.
+
+Both jobs render `evals/report_html.py` into an `eval_report.html` dashboard
+(metric tiles, per-category accuracy, per-case table) and upload it as a build
+artifact. Generate it locally with `python -m evals.report_html`.
 
 The last recorded full run is committed at `evals/baseline_report.json`:
 
@@ -163,6 +189,9 @@ The last recorded full run is committed at `evals/baseline_report.json`:
   the model phrased it differently; the eval suite caught it.
 - **The eval gate keys on false-allow, not just accuracy.** A missed adversarial
   prompt is the expensive error, so refusal rate is a separate threshold.
+- **Retrieved content is untrusted.** The evidence scan strips instruction-like
+  text from documents before synthesis, deterministically, rather than relying on
+  the model to ignore an injected "ignore your instructions" in a Notion page.
 - **Two eval paths.** Unit tests mock the model (fast, free, every push). The real
   eval runs on demand against live models. Offline mode (`GUARDRAIL_OFFLINE=1`)
   exercises the whole pipeline with canned responses for demos and a free CI
@@ -185,11 +214,12 @@ src/guardrail_agent/
   decompose.py        query decomposition
   synthesize.py       cited-answer synthesis
   connectors/         Connector interface; real Notion, mock Gmail/Jira
-  guardrails/         input, pii, permission, citation_validation, output_validation
+  guardrails/         input, permission, evidence_scan, pii, citation_validation, output_validation
 evals/
-  dataset.jsonl        36 labeled cases
+  dataset.jsonl        38 labeled cases
   run_eval.py          runner + threshold gate
   judge.py             LLM content judge
+  report_html.py       renders a report JSON into an HTML dashboard
   baseline_report.json last recorded full run
 fixtures/             mock connector corpora
 tests/                unit tests (mocked LLM, no API calls)

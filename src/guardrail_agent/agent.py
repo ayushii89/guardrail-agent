@@ -2,7 +2,7 @@
 
 Guardrailed pipeline:
 
-    input guardrail -> permission -> decompose -> retrieve
+    input guardrail -> permission -> decompose -> retrieve -> evidence scan
       -> PII redaction -> synthesize -> citation validation -> output validation
 """
 
@@ -18,6 +18,7 @@ from guardrail_agent.guardrails import (
     check_input,
     check_permission,
     redact_evidence,
+    scan_evidence,
     validate_citations,
     validate_output,
 )
@@ -84,7 +85,11 @@ class GuardrailAgent:
         # 4. retrieve
         evidence = self._retrieve(trace)
 
-        # 5. PII redaction (before evidence reaches the synthesis model)
+        # 5. evidence scan: strip instruction-like text from untrusted documents
+        evidence, g_scan = scan_evidence(evidence)
+        trace.guardrails.append(g_scan)
+
+        # 6. PII redaction (before evidence reaches the synthesis model)
         evidence, kinds = redact_evidence(evidence)
         trace.guardrails.append(
             GuardrailResult(
@@ -96,7 +101,7 @@ class GuardrailAgent:
             )
         )
 
-        # 6. synthesize
+        # 7. synthesize
         try:
             answer, usage = synthesize(question, evidence)
             add_tokens(usage)
@@ -105,12 +110,12 @@ class GuardrailAgent:
             trace.refusal_reason = f"synthesis_error: {e}"
             return finish()
 
-        # 7. citation validation
+        # 8. citation validation
         answer, g_cite, usage = validate_citations(answer)
         trace.guardrails.append(g_cite)
         add_tokens(usage)
 
-        # 8. output validation
+        # 9. output validation
         answer, g_out = validate_output(answer)
         trace.guardrails.append(g_out)
         trace.answer = answer

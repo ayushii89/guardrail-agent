@@ -143,11 +143,13 @@ PIPELINE = [
     (Stage.PERMISSION, "Permission layer"),
     (Stage.DECOMPOSE, "Decompose"),
     (Stage.RETRIEVE, "Retrieve"),
+    (Stage.EVIDENCE_SCAN, "Evidence scan"),
     (Stage.PII_REDACTION, "PII redaction"),
     (Stage.SYNTHESIZE, "Synthesize"),
     (Stage.CITATION_VALIDATION, "Citation validation"),
     (Stage.OUTPUT_VALIDATION, "Output validation"),
 ]
+N_STAGES = len(PIPELINE)
 
 _PILL = {"pass": "pass", "warn": "notes", "block": "blocked", "skip": "skipped"}
 
@@ -177,7 +179,7 @@ def _stage_states(trace: AgentTrace) -> list[tuple[str, str, str, list[str]]]:
             detail = f"{ev_n} evidence snippet(s)"
             if trace.tool_errors:
                 detail += " · " + "; ".join(trace.tool_errors)
-        elif stage is Stage.PII_REDACTION and g:
+        elif stage in (Stage.EVIDENCE_SCAN, Stage.PII_REDACTION) and g:
             status = "warn" if g.violated_policies else "pass"
             detail = g.rationale
         elif stage is Stage.SYNTHESIZE:
@@ -248,7 +250,7 @@ def render(trace: AgentTrace) -> None:
         '<div class="stats">'
         f'<div class="chip"><b>{trace.latency_s:.1f}s</b><span>latency</span></div>'
         f'<div class="chip"><b>{trace.total_tokens:,}</b><span>tokens · in {trace.input_tokens:,} / out {trace.output_tokens:,}</span></div>'
-        f'<div class="chip"><b>{passed}/8</b><span>stages passed</span></div>'
+        f'<div class="chip"><b>{passed}/{N_STAGES}</b><span>stages passed</span></div>'
         "</div>",
         unsafe_allow_html=True,
     )
@@ -275,7 +277,7 @@ st.markdown(
     '<div class="gc-head"><div class="gc-mark">🛡️</div>'
     '<div class="gc-title">Guardrail Console</div></div>'
     f'<div class="gc-sub">agentic RAG over <b>gmail</b>·fixture / {_notion_tag} / <b>jira</b>·fixture '
-    "&nbsp;·&nbsp; 8-stage guardrail pipeline &nbsp;·&nbsp; every verdict traced</div>",
+    f"&nbsp;·&nbsp; {N_STAGES}-stage guardrail pipeline &nbsp;·&nbsp; every verdict traced</div>",
     unsafe_allow_html=True,
 )
 
