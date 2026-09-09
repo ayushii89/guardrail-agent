@@ -15,6 +15,7 @@ from typing import Any
 import anthropic
 
 from guardrail_agent.config import SETTINGS
+from guardrail_agent.offline import offline_enabled, offline_json
 
 _FENCE = re.compile(r"```(?:json)?\s*(.*?)\s*```", re.DOTALL)
 _OBJECT = re.compile(r"\{.*\}", re.DOTALL)
@@ -55,6 +56,8 @@ def complete_json(
     max_tokens: int = 1024,
 ) -> tuple[dict[str, Any], tuple[int, int]]:
     """Return (parsed_object, (input_tokens, output_tokens))."""
+    if offline_enabled():
+        return offline_json(system=system, user=user), (0, 0)
     resp = get_client().messages.create(
         model=model,
         max_tokens=max_tokens,
@@ -73,6 +76,8 @@ def complete_text(
     model: str,
     max_tokens: int = 1024,
 ) -> tuple[str, tuple[int, int]]:
+    if offline_enabled():
+        return "", (0, 0)
     resp = get_client().messages.create(
         model=model,
         max_tokens=max_tokens,

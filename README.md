@@ -43,6 +43,18 @@ cp .env.example .env    # add your ANTHROPIC_API_KEY
 Models are configurable in `.env`: `GUARDRAIL_AGENT_MODEL` (default `claude-opus-5`),
 `GUARDRAIL_GUARD_MODEL` and `GUARDRAIL_JUDGE_MODEL` (default `claude-sonnet-5`).
 
+### Offline mode (no API spend)
+
+Set `GUARDRAIL_OFFLINE=1` to run the entire pipeline with deterministic canned
+responses and zero API calls. Answers are built from the retrieved fixtures, so
+they are grounded; the guardrail and judge verdicts are heuristics rather than a
+real model. Use it for demos, local development, and the CI harness smoke test.
+
+```bash
+GUARDRAIL_OFFLINE=1 guardrail ask "What are the Project X goals and blockers?"
+GUARDRAIL_OFFLINE=1 streamlit run app.py
+```
+
 ## Usage
 
 ```bash
@@ -111,8 +123,8 @@ real regressions trip the gate.
 
 ## CI
 
-- **`ci.yml`: lint + unit tests** on every push and PR (`ruff`, `pytest`, no API
-  key, no spend).
+- **`ci.yml`: lint + unit tests + offline eval smoke** on every push and PR
+  (`ruff`, `pytest`, and a full `run_eval` in offline mode). No API key, no spend.
 - **`eval.yml`: evaluation gate** on same-repo PRs and manual dispatch. Runs
   `run_eval --check-thresholds` against the `ANTHROPIC_API_KEY` secret and uploads
   `eval_report.json`. Opt-in rather than per-push because it makes live API calls.

@@ -150,8 +150,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--check-thresholds", action="store_true")
     args = ap.parse_args(argv)
 
-    if not os.getenv("ANTHROPIC_API_KEY"):
-        print("ANTHROPIC_API_KEY is not set; the eval suite needs API access.", file=sys.stderr)
+    from guardrail_agent.offline import offline_enabled
+
+    if not os.getenv("ANTHROPIC_API_KEY") and not offline_enabled():
+        print(
+            "Set ANTHROPIC_API_KEY, or GUARDRAIL_OFFLINE=1 for a no-spend run.",
+            file=sys.stderr,
+        )
         return 2
 
     cases = _load_cases(args.limit, args.category)

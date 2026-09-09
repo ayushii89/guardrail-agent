@@ -23,3 +23,7 @@ jobs:
         run: ruff check .
       - name: pytest
         run: pytest -q
+      - name: eval harness smoke test (offline, no API spend)
+        env:
+          GUARDRAIL_OFFLINE: "1"
+        run: python -m evals.run_eval
