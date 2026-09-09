@@ -18,6 +18,9 @@ dev = [
 viz = [
     "streamlit>=1.30",
 ]
+notion = [
+    "notion-client>=2.2",
+]
 
 [project.scripts]
 guardrail = "guardrail_agent.cli:main"

@@ -268,10 +268,12 @@ def render(trace: AgentTrace) -> None:
 
 # ----------------------------------------------------------------------------- layout
 
+_notion_live = bool(os.getenv("NOTION_API_KEY"))
+_notion_tag = "<b>notion</b>·live" if _notion_live else "notion·fixture"
 st.markdown(
     '<div class="gc-head"><div class="gc-mark">🛡️</div>'
     '<div class="gc-title">Guardrail Console</div></div>'
-    '<div class="gc-sub">agentic RAG over mock <b>gmail</b> / <b>notion</b> / <b>jira</b> '
+    f'<div class="gc-sub">agentic RAG over <b>gmail</b>·fixture / {_notion_tag} / <b>jira</b>·fixture '
     "&nbsp;·&nbsp; 8-stage guardrail pipeline &nbsp;·&nbsp; every verdict traced</div>",
     unsafe_allow_html=True,
 )
