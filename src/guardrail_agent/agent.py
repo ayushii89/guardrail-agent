@@ -1,8 +1,9 @@
 """Agent orchestrator.
 
-Day 2 pipeline (guardrails are layered in on Day 3):
+Guardrailed pipeline:
 
-    decompose -> retrieve per sub-question -> dedupe -> synthesize
+    input guardrail -> permission -> decompose -> retrieve
+      -> PII redaction -> synthesize -> citation validation -> output validation
 """
 
 from __future__ import annotations
@@ -13,13 +14,20 @@ from guardrail_agent.client import ModelResponseError
 from guardrail_agent.connectors import build_registry, route
 from guardrail_agent.connectors.base import Connector, ConnectorError
 from guardrail_agent.decompose import decompose
-from guardrail_agent.schema import AgentTrace, Evidence
+from guardrail_agent.guardrails import (
+    check_input,
+    check_permission,
+    redact_evidence,
+    validate_citations,
+    validate_output,
+)
+from guardrail_agent.schema import AgentTrace, Evidence, GuardrailResult, Stage
 from guardrail_agent.synthesize import synthesize
 
 
 class GuardrailAgent:
     def __init__(self, connectors: dict[str, Connector] | None = None, per_source_limit: int = 3):
-        self.connectors = connectors or build_registry()
+        self.connectors = connectors if connectors is not None else build_registry()
         self.per_source_limit = per_source_limit
 
     def _retrieve(self, trace: AgentTrace) -> list[Evidence]:
@@ -43,21 +51,71 @@ class GuardrailAgent:
         started = time.perf_counter()
         trace = AgentTrace(question=question)
 
-        decomp, usage = decompose(question)
-        trace.decomposition = decomp
-        trace.input_tokens += usage[0]
-        trace.output_tokens += usage[1]
+        def finish() -> AgentTrace:
+            trace.latency_s = round(time.perf_counter() - started, 3)
+            return trace
 
-        evidence = self._retrieve(trace)
-
-        try:
-            answer, usage = synthesize(question, evidence)
-            trace.answer = answer
+        def add_tokens(usage: tuple[int, int]) -> None:
             trace.input_tokens += usage[0]
             trace.output_tokens += usage[1]
+
+        # 1. input guardrail
+        g_in, usage = check_input(question)
+        trace.guardrails.append(g_in)
+        add_tokens(usage)
+        if g_in.blocked:
+            trace.refused = True
+            trace.refusal_reason = f"input_guardrail: {g_in.rationale}"
+            return finish()
+
+        # 2. permission layer (read-only agent)
+        g_perm = check_permission(question)
+        trace.guardrails.append(g_perm)
+        if g_perm.blocked:
+            trace.needs_confirmation = True
+            trace.refusal_reason = g_perm.rationale
+            return finish()
+
+        # 3. decompose
+        decomp, usage = decompose(question)
+        trace.decomposition = decomp
+        add_tokens(usage)
+
+        # 4. retrieve
+        evidence = self._retrieve(trace)
+
+        # 5. PII redaction (before evidence reaches the synthesis model)
+        evidence, kinds = redact_evidence(evidence)
+        trace.guardrails.append(
+            GuardrailResult(
+                stage=Stage.PII_REDACTION,
+                allowed=True,
+                violated_policies=["pii_present"] if kinds else [],
+                severity="low" if kinds else "none",
+                rationale=f"redacted {kinds}" if kinds else "no PII found",
+            )
+        )
+
+        # 6. synthesize
+        try:
+            answer, usage = synthesize(question, evidence)
+            add_tokens(usage)
         except ModelResponseError as e:
             trace.refused = True
             trace.refusal_reason = f"synthesis_error: {e}"
+            return finish()
 
-        trace.latency_s = round(time.perf_counter() - started, 3)
-        return trace
+        # 7. citation validation
+        answer, g_cite, usage = validate_citations(answer)
+        trace.guardrails.append(g_cite)
+        add_tokens(usage)
+
+        # 8. output validation
+        answer, g_out = validate_output(answer)
+        trace.guardrails.append(g_out)
+        trace.answer = answer
+        if g_out.blocked:
+            trace.refused = True
+            trace.refusal_reason = f"output_validation: {g_out.rationale}"
+
+        return finish()

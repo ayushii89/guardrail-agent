@@ -15,6 +15,23 @@ class FakeLLM:
     """Stub for ``complete_json``. Routes on the system prompt, records calls,
     and can be told to fail a given stage."""
 
+    _DOMAIN_HINTS = (
+        "project",
+        "task",
+        "deadline",
+        "blocker",
+        "goal",
+        "roadmap",
+        "jira",
+        "notion",
+        "gmail",
+        "ticket",
+        "launch",
+        "status",
+        "sprint",
+        "owner",
+    )
+
     def __init__(self):
         self.calls: list[dict] = []
         self.fail_stage: str | None = None  # "decompose" | "synthesize"
@@ -22,6 +39,22 @@ class FakeLLM:
     def complete_json(self, *, system: str, user: str, model: str, max_tokens: int = 1024):
         self.calls.append({"system": system, "user": user, "model": model})
         usage = (120, 40)
+
+        if "input guardrail" in system:
+            in_domain = any(h in user.lower() for h in self._DOMAIN_HINTS)
+            return {
+                "allowed": in_domain,
+                "violated_policies": [] if in_domain else ["out_of_scope"],
+                "severity": "none" if in_domain else "medium",
+                "rationale": "ok" if in_domain else "outside the project-status domain",
+            }, usage
+
+        if "verify citations" in system:
+            # Support every claim; dedicated citation tests patch this directly.
+            indices = [int(n) for n in re.findall(r"\[claim (\d+)\]", user)]
+            return {
+                "verdicts": [{"index": i, "supported": True, "reason": "ok"} for i in indices]
+            }, usage
 
         if "sub-questions" in system:
             if self.fail_stage == "decompose":
@@ -48,6 +81,12 @@ class FakeLLM:
 @pytest.fixture
 def fake_llm(monkeypatch):
     stub = FakeLLM()
-    monkeypatch.setattr("guardrail_agent.decompose.complete_json", stub.complete_json)
-    monkeypatch.setattr("guardrail_agent.synthesize.complete_json", stub.complete_json)
+    mods = (
+        "decompose",
+        "synthesize",
+        "guardrails.input_guardrail",
+        "guardrails.citation_validation",
+    )
+    for mod in mods:
+        monkeypatch.setattr(f"guardrail_agent.{mod}.complete_json", stub.complete_json)
     return stub

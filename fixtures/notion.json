@@ -1,7 +1,7 @@
 [
   {
     "id": "notion-1",
-    "title": "Project X — Goals & Roadmap",
+    "title": "Project X: Goals & Roadmap",
     "text": "Project X aims to expand into new markets (Germany, France) and grow ARR by 20%. Roadmap: Q3 beta, Q4 GA. Owner: Priya. This doc is the source of truth for goals.",
     "url": "https://notion.example.com/project-x-goals"
   },
@@ -13,13 +13,13 @@
   },
   {
     "id": "notion-3",
-    "title": "Design Review Notes — Sept",
+    "title": "Design Review Notes: Sept",
     "text": "Design review completed. Two deadlines were updated last week as a result. Action items assigned to design and frontend.",
     "url": "https://notion.example.com/design-review-sept"
   },
   {
     "id": "notion-4",
-    "title": "Market Entry Plan — France",
+    "title": "Market Entry Plan: France",
     "text": "FR entry requires legal sign-off, a French-language support tier, and a local payment provider. Blocked on legal review as of this week.",
     "url": "https://notion.example.com/fr-market-entry"
   },
@@ -43,7 +43,7 @@
   },
   {
     "id": "notion-8",
-    "title": "Retro — August",
+    "title": "Retro: August",
     "text": "August retro: shipped analytics dashboard, slipped on SSO. Biggest risk called out was the staging environment instability.",
     "url": "https://notion.example.com/retro-august"
   }
