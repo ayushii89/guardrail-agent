@@ -26,6 +26,7 @@ class GuardrailResult(BaseModel):
     violated_policies: list[str] = Field(default_factory=list)
     severity: str = "none"  # none | low | medium | high
     rationale: str = ""
+    dropped_claims: list[str] = Field(default_factory=list)  # citation validation
 
     @property
     def blocked(self) -> bool:

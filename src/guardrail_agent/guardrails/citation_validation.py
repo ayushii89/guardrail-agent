@@ -75,5 +75,6 @@ def validate_citations(
         violated_policies=["unsupported_claim"] if dropped else [],
         severity="medium" if dropped else "none",
         rationale=rationale,
+        dropped_claims=dropped,
     )
     return new_answer, result, usage

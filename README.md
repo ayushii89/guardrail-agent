@@ -57,6 +57,19 @@ guardrail ask "Close the staging-environment blocker ticket PX-102"
 # CONFIRMATION REQUIRED before proceeding.
 ```
 
+## Trace viewer
+
+A Streamlit UI that runs a question and shows every stage of the pipeline: each
+guardrail verdict (pass / pass-with-notes / blocked), the decomposition, claims
+dropped by citation validation, the cited answer with PII-redacted evidence, and
+the token / latency cost. Sidebar has sample questions and a connector-failure
+toggle.
+
+```bash
+pip install -e ".[viz]"
+streamlit run app.py
+```
+
 ## Evaluation
 
 ```bash
@@ -99,6 +112,7 @@ real regressions trip the gate.
 ## Layout
 
 ```
+app.py                Streamlit trace viewer
 src/guardrail_agent/
   agent.py            orchestrator
   decompose.py        query decomposition
