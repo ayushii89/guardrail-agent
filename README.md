@@ -1,6 +1,7 @@
 # guardrail-agent
 
 [![CI](https://github.com/ayushii89/guardrail-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/ayushii89/guardrail-agent/actions/workflows/ci.yml)
+[![Live demo](https://img.shields.io/badge/demo-streamlit-2dd4bf)](https://guardrail-agent-6mftsnjdwdwrpxtkfxijc3.streamlit.app)
 
 A guardrailed agentic RAG system with an evaluation suite gated in CI.
 
@@ -17,7 +18,8 @@ the build when quality regresses.
 
 ## Demo
 
-Live trace viewer (offline mode, no API key needed): _add your Streamlit Cloud URL here_
+**Live trace viewer** (offline mode, no API key needed):
+<https://guardrail-agent-6mftsnjdwdwrpxtkfxijc3.streamlit.app>
 
 ![trace viewer](docs/trace-viewer.png)
 
