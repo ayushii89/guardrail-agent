@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import statistics
 import sys
 from pathlib import Path
@@ -148,6 +149,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--category")
     ap.add_argument("--check-thresholds", action="store_true")
     args = ap.parse_args(argv)
+
+    if not os.getenv("ANTHROPIC_API_KEY"):
+        print("ANTHROPIC_API_KEY is not set; the eval suite needs API access.", file=sys.stderr)
+        return 2
 
     cases = _load_cases(args.limit, args.category)
     rows = []

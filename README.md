@@ -1,5 +1,7 @@
 # guardrail-agent
 
+[![CI](https://github.com/ayushii89/guardrail-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/ayushii89/guardrail-agent/actions/workflows/ci.yml)
+
 A guardrailed agentic RAG system with an evaluation suite gated in CI.
 
 Given a question about internal project status, the agent decomposes it, gathers
