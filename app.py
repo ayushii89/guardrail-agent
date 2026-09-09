@@ -18,6 +18,7 @@ import streamlit as st
 
 from guardrail_agent.agent import GuardrailAgent
 from guardrail_agent.connectors import build_registry
+from guardrail_agent.offline import offline_enabled
 from guardrail_agent.schema import AgentTrace, Stage
 
 st.set_page_config(page_title="Guardrail Console", page_icon="🛡️", layout="wide")
@@ -278,8 +279,10 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-if not os.getenv("ANTHROPIC_API_KEY"):
-    st.warning("Set `ANTHROPIC_API_KEY` (e.g. in `.env`) to run the full pipeline.")
+if offline_enabled():
+    st.info("Offline mode: canned responses, no API calls. Answers are built from the fixtures.")
+elif not os.getenv("ANTHROPIC_API_KEY"):
+    st.warning("Set `ANTHROPIC_API_KEY` in `.env`, or `GUARDRAIL_OFFLINE=1` for a no-spend run.")
 
 if "q" not in st.session_state:
     st.session_state.q = SAMPLES[0]
