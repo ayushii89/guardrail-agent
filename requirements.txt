@@ -1,0 +1,4 @@
+# For Streamlit Community Cloud (installs the package + its deps, plus streamlit).
+# Local dev should use:  pip install -e ".[dev,viz]"
+-e .
+streamlit>=1.30

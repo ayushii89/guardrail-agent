@@ -279,10 +279,13 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# No key and not explicitly offline -> fall back to offline so a public deploy
+# (e.g. Streamlit Community Cloud) works with no configuration.
+if not os.getenv("ANTHROPIC_API_KEY") and not offline_enabled():
+    os.environ["GUARDRAIL_OFFLINE"] = "1"
+
 if offline_enabled():
     st.info("Offline mode: canned responses, no API calls. Answers are built from the fixtures.")
-elif not os.getenv("ANTHROPIC_API_KEY"):
-    st.warning("Set `ANTHROPIC_API_KEY` in `.env`, or `GUARDRAIL_OFFLINE=1` for a no-spend run.")
 
 if "q" not in st.session_state:
     st.session_state.q = SAMPLES[0]

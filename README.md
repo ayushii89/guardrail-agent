@@ -15,6 +15,14 @@ the build when quality regresses.
 > `Connector` interface, so swapping in the real Gmail / Jira clients is the same
 > change.
 
+## Demo
+
+Live trace viewer (offline mode, no API key needed): _add your Streamlit Cloud URL here_
+
+![trace viewer](docs/trace-viewer.png)
+
+Or run it locally: `GUARDRAIL_OFFLINE=1 streamlit run app.py`
+
 ## Pipeline
 
 ```
@@ -134,6 +142,29 @@ The last recorded full run is committed at `evals/baseline_report.json`:
 | accuracy | refusal | grounded | p50 latency | mean tokens |
 | --- | --- | --- | --- | --- |
 | 1.00 (36/36) | 10/10 | 1.00 | 14.1 s | 2602 |
+
+## Design decisions
+
+- **Guardrails fail closed.** If the input classifier or the citation judge errors
+  or returns unparseable output, the request is blocked / claims are dropped, never
+  waved through. A guardrail that fails open is not a guardrail.
+- **PII redaction is deterministic, not model-based.** Regex over evidence before
+  it reaches the model and again over the final answer. Redaction must be
+  predictable and testable; an LLM that "usually" catches an email address is not
+  good enough, and it costs a call.
+- **The agent is read-only.** Any request to act in a connected system (send an
+  email, close a ticket) stops at the permission layer with `needs_confirmation`.
+  Nothing in the pipeline can take a side effect.
+- **Abstention is structured, not string-matched.** `synthesize` returns
+  `{"answerable": bool}` and emits a typed `Claim(kind="abstention")`. An earlier
+  version matched the phrase "no evidence" in the answer text and broke the moment
+  the model phrased it differently; the eval suite caught it.
+- **The eval gate keys on false-allow, not just accuracy.** A missed adversarial
+  prompt is the expensive error, so refusal rate is a separate threshold.
+- **Two eval paths.** Unit tests mock the model (fast, free, every push). The real
+  eval runs on demand against live models. Offline mode (`GUARDRAIL_OFFLINE=1`)
+  exercises the whole pipeline with canned responses for demos and a free CI
+  harness smoke test.
 
 ## Extending
 
