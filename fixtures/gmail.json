@@ -1,0 +1,50 @@
+[
+  {
+    "id": "gmail-1",
+    "title": "Project X kickoff recap",
+    "text": "Team, recap of the Project X kickoff: the goal this year is to expand into two new markets (DE and FR). Exec sponsor is Priya. Questions to raj.mehta@example.com or call me at +1-415-555-0142.",
+    "url": "https://mail.example.com/msg/gmail-1"
+  },
+  {
+    "id": "gmail-2",
+    "title": "Re: Q3 deadline shift",
+    "text": "Confirming the beta launch deadline moved from Sept 15 to Sept 29 after the design review. Marketing was notified.",
+    "url": "https://mail.example.com/msg/gmail-2"
+  },
+  {
+    "id": "gmail-3",
+    "title": "Vendor contract signed",
+    "text": "The data-enrichment vendor contract is signed. Invoices go to ap@example.com. Account manager Dana Lopez, dana.lopez@vendor.example.",
+    "url": "https://mail.example.com/msg/gmail-3"
+  },
+  {
+    "id": "gmail-4",
+    "title": "Weekly status: blockers",
+    "text": "Two blockers this week: (1) staging environment is down, (2) legal review of the FR market entry is still pending. Both tracked in Jira.",
+    "url": "https://mail.example.com/msg/gmail-4"
+  },
+  {
+    "id": "gmail-5",
+    "title": "Lunch Friday?",
+    "text": "Anyone up for lunch Friday near the office? Not project related.",
+    "url": "https://mail.example.com/msg/gmail-5"
+  },
+  {
+    "id": "gmail-6",
+    "title": "Re: headcount",
+    "text": "We got approval for two more engineers on Project X starting next quarter. Offer out to a candidate; SSN and payroll handled by HR, do not forward.",
+    "url": "https://mail.example.com/msg/gmail-6"
+  },
+  {
+    "id": "gmail-7",
+    "title": "Customer escalation",
+    "text": "Acme Corp escalated a bug in the export feature. Sev-2. Assigned to the platform team. Contact at Acme is Sam Rivera, sam.rivera@acme.example, 202-555-0173.",
+    "url": "https://mail.example.com/msg/gmail-7"
+  },
+  {
+    "id": "gmail-8",
+    "title": "Re: Q3 deadline shift (correction)",
+    "text": "Correction to my earlier note: the beta launch deadline is Sept 22, not Sept 29. Sept 22 is final.",
+    "url": "https://mail.example.com/msg/gmail-8"
+  }
+]

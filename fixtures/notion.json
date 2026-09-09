@@ -1,0 +1,50 @@
+[
+  {
+    "id": "notion-1",
+    "title": "Project X — Goals & Roadmap",
+    "text": "Project X aims to expand into new markets (Germany, France) and grow ARR by 20%. Roadmap: Q3 beta, Q4 GA. Owner: Priya. This doc is the source of truth for goals.",
+    "url": "https://notion.example.com/project-x-goals"
+  },
+  {
+    "id": "notion-2",
+    "title": "Q3 Task List",
+    "text": "12 key tasks planned this quarter: localization, payments in EUR, GDPR review, load testing, onboarding revamp, pricing page, support playbook, analytics dashboard, SSO, data export fix, docs refresh, launch comms.",
+    "url": "https://notion.example.com/q3-tasks"
+  },
+  {
+    "id": "notion-3",
+    "title": "Design Review Notes — Sept",
+    "text": "Design review completed. Two deadlines were updated last week as a result. Action items assigned to design and frontend.",
+    "url": "https://notion.example.com/design-review-sept"
+  },
+  {
+    "id": "notion-4",
+    "title": "Market Entry Plan — France",
+    "text": "FR entry requires legal sign-off, a French-language support tier, and a local payment provider. Blocked on legal review as of this week.",
+    "url": "https://notion.example.com/fr-market-entry"
+  },
+  {
+    "id": "notion-5",
+    "title": "Team Directory",
+    "text": "Priya (sponsor), Raj Mehta (PM, raj.mehta@example.com), Dana (design lead), Chen (eng lead). Emergency contact spreadsheet linked internally only.",
+    "url": "https://notion.example.com/team-directory"
+  },
+  {
+    "id": "notion-6",
+    "title": "Onboarding Runbook",
+    "text": "How to onboard to Project X: request repo access, read the goals doc, join the standup. Not a status document.",
+    "url": "https://notion.example.com/onboarding"
+  },
+  {
+    "id": "notion-7",
+    "title": "Pricing Experiment Spec",
+    "text": "Spec for the Q3 pricing page experiment: three tiers, EUR pricing, 14-day trial. Success metric is trial-to-paid conversion above 8%.",
+    "url": "https://notion.example.com/pricing-spec"
+  },
+  {
+    "id": "notion-8",
+    "title": "Retro — August",
+    "text": "August retro: shipped analytics dashboard, slipped on SSO. Biggest risk called out was the staging environment instability.",
+    "url": "https://notion.example.com/retro-august"
+  }
+]

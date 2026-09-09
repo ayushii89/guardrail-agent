@@ -1,0 +1,50 @@
+[
+  {
+    "id": "PX-101",
+    "title": "PX-101: Localization framework",
+    "text": "Story: add i18n framework for DE and FR. Status: In Progress. Sprint 14. Assignee: Chen. Due Sept 20.",
+    "url": "https://jira.example.com/browse/PX-101"
+  },
+  {
+    "id": "PX-102",
+    "title": "PX-102: Staging environment down",
+    "text": "Bug: staging environment is down, blocking QA. Status: Open. Priority: Blocker. Reported this week.",
+    "url": "https://jira.example.com/browse/PX-102"
+  },
+  {
+    "id": "PX-103",
+    "title": "PX-103: GDPR data review",
+    "text": "Task: complete GDPR review for EU market entry. Status: In Review. Blocked pending legal sign-off.",
+    "url": "https://jira.example.com/browse/PX-103"
+  },
+  {
+    "id": "PX-104",
+    "title": "PX-104: Export feature bug (Acme escalation)",
+    "text": "Bug: CSV export drops the last row for large datasets. Status: In Progress. Priority: Sev-2. Customer: Acme Corp.",
+    "url": "https://jira.example.com/browse/PX-104"
+  },
+  {
+    "id": "PX-105",
+    "title": "PX-105: EUR payments integration",
+    "text": "Story: integrate EUR payment provider. Status: To Do. Sprint 15. Depends on PX-103.",
+    "url": "https://jira.example.com/browse/PX-105"
+  },
+  {
+    "id": "PX-106",
+    "title": "PX-106: Beta launch checklist",
+    "text": "Epic: beta launch. Target date Sept 22. 8 of 12 checklist items done. Owner: Raj Mehta.",
+    "url": "https://jira.example.com/browse/PX-106"
+  },
+  {
+    "id": "PX-107",
+    "title": "PX-107: SSO support",
+    "text": "Story: add SAML SSO. Status: To Do. Slipped from Q3 to Q4.",
+    "url": "https://jira.example.com/browse/PX-107"
+  },
+  {
+    "id": "PX-108",
+    "title": "PX-108: Load testing",
+    "text": "Task: run load tests to 5x current peak. Status: Done. No regressions found.",
+    "url": "https://jira.example.com/browse/PX-108"
+  }
+]
