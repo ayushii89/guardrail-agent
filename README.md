@@ -20,7 +20,7 @@ the build when quality regresses.
 **Live trace viewer** (offline mode, no API key needed):
 <https://guardrail-agent-6mftsnjdwdwrpxtkfxijc3.streamlit.app>
 
-<!-- ![trace viewer](docs/trace-viewer.png)  -- add screenshot: see docs/README.md -->
+![trace viewer](docs/trace-viewer.png)
 
 Or run it locally: `GUARDRAIL_OFFLINE=1 streamlit run app.py`
 
