@@ -46,5 +46,29 @@
     "title": "PX-108: Load testing",
     "text": "Task: run load tests to 5x current peak. Status: Done. No regressions found.",
     "url": "https://jira.example.com/browse/PX-108"
+  },
+  {
+    "id": "PX-109",
+    "title": "PX-109: Field-level encryption for export",
+    "text": "Story: encrypt PII fields in the data export. Status: In Progress. Sprint 15. Assignee: Dana. Blocks the security review sign-off.",
+    "url": "https://jira.example.com/browse/PX-109"
+  },
+  {
+    "id": "PX-110",
+    "title": "PX-110: Rate limiting on EUR payments",
+    "text": "Task: add rate limiting to the EUR payment endpoint. Status: To Do. Priority: High. From the threat model.",
+    "url": "https://jira.example.com/browse/PX-110"
+  },
+  {
+    "id": "PX-111",
+    "title": "PX-111: Analytics dashboard weekly view",
+    "text": "Story: add a weekly view to the analytics dashboard. Status: To Do. Requested by an early beta customer.",
+    "url": "https://jira.example.com/browse/PX-111"
+  },
+  {
+    "id": "PX-112",
+    "title": "PX-112: Beta invite system",
+    "text": "Story: build the invite-only signup for beta, capped at 500 accounts. Status: In Progress. Sprint 14. Assignee: Chen.",
+    "url": "https://jira.example.com/browse/PX-112"
   }
 ]

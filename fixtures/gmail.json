@@ -46,5 +46,29 @@
     "title": "Re: Q3 deadline shift (correction)",
     "text": "Correction to my earlier note: the beta launch deadline is Sept 22, not Sept 29. Sept 22 is final.",
     "url": "https://mail.example.com/msg/gmail-8"
+  },
+  {
+    "id": "gmail-9",
+    "title": "Security review scheduled",
+    "text": "The Project X security review with the AppSec team is booked for Sept 18. Threat model doc due two days before. Owner: Chen.",
+    "url": "https://mail.example.com/msg/gmail-9"
+  },
+  {
+    "id": "gmail-10",
+    "title": "Re: on-call for launch week",
+    "text": "On-call rotation for beta launch week: Chen (primary), Dana (secondary). Escalation path goes to Priya.",
+    "url": "https://mail.example.com/msg/gmail-10"
+  },
+  {
+    "id": "gmail-11",
+    "title": "Budget approved for localization vendor",
+    "text": "Finance approved 40k for the localization vendor covering DE and FR. PO number will follow from procurement.",
+    "url": "https://mail.example.com/msg/gmail-11"
+  },
+  {
+    "id": "gmail-12",
+    "title": "Re: analytics dashboard feedback",
+    "text": "Early feedback on the analytics dashboard is positive. Two change requests: add a weekly view and export to CSV. Tracked in Jira.",
+    "url": "https://mail.example.com/msg/gmail-12"
   }
 ]

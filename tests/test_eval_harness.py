@@ -25,7 +25,7 @@ def _row(**kw):
 
 def test_dataset_is_wellformed():
     cases = [json.loads(x) for x in DATASET.read_text().splitlines() if x.strip()]
-    assert len(cases) >= 30
+    assert len(cases) >= 70
     ids = [c["id"] for c in cases]
     assert len(ids) == len(set(ids))
     for c in cases:

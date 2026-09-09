@@ -6,15 +6,14 @@
 A guardrailed agentic RAG system with an evaluation suite gated in CI.
 
 Given a question about internal project status, the agent decomposes it, gathers
-cited evidence from mock Gmail / Notion / Jira connectors, and passes every stage
-through a guardrail. A 38-case evaluation suite runs on every change and blocks
+cited evidence from Gmail / Notion / Jira connectors, and passes every stage
+through a guardrail. An 82-case evaluation suite runs on every change and blocks
 the build when quality regresses.
 
-> Gmail and Jira are mock adapters backed by JSON fixtures in `fixtures/`. **Notion
-> is a real connector**: set `NOTION_API_KEY` and it queries the live Notion search
-> API; without a token it falls back to the fixture. All three subclass the same
-> `Connector` interface, so swapping in the real Gmail / Jira clients is the same
-> change.
+> **Notion and Jira are real connectors** (set their credentials and they query
+> the live APIs); Gmail is a mock adapter. Every connector falls back to a JSON
+> fixture in `fixtures/` when its credentials are absent, and all subclass the
+> same `Connector` interface, so the real Gmail client is the same change.
 
 ## Demo
 
@@ -37,7 +36,7 @@ flowchart TD
     D --> RT[Retrieve]
     RT --> G[(Gmail<br/>fixture)]
     RT --> N[(Notion<br/>live API)]
-    RT --> J[(Jira<br/>fixture)]
+    RT --> J[(Jira<br/>live API)]
     G & N & J --> ES{{Evidence scan}}
     ES --> PII{{PII redaction}}
     PII --> S[Synthesize]
@@ -103,20 +102,20 @@ guardrail ask "Close the staging-environment blocker ticket PX-102"
 # CONFIRMATION REQUIRED before proceeding.
 ```
 
-## Live Notion connector (optional)
+## Live connectors (optional)
 
-```bash
-pip install -e ".[notion]"
-```
+Each connector uses its live API when its credentials are present in `.env`, and
+falls back to the fixture otherwise. Any mix is fine.
 
-1. Create an **internal integration** at <https://www.notion.so/my-integrations>
-2. Put its token in `.env` as `NOTION_API_KEY=ntn_...`
-3. Open each page or database you want searchable, `•••` menu -> **Connections** ->
-   add your integration
+**Notion** (`pip install -e ".[notion]"`):
+1. Create an internal integration at <https://www.notion.so/my-integrations>
+2. `NOTION_API_KEY=ntn_...`
+3. Share the pages/databases with the integration (`•••` -> Connections)
 
-With the token set, `guardrail ask` and the trace viewer query real Notion pages
-for the "notion" evidence source; Gmail and Jira stay on fixtures. Unset the token
-and everything reverts to the fixture corpus.
+**Jira** (no extra dependency, uses the stdlib):
+1. Create an API token at <https://id.atlassian.com/manage-profile/security/api-tokens>
+2. `JIRA_BASE_URL=https://yoursite.atlassian.net`, `JIRA_EMAIL=...`, `JIRA_API_TOKEN=...`
+3. The connector runs a JQL text search over `/rest/api/3/search/jql`
 
 ## Trace viewer
 
@@ -165,11 +164,17 @@ Both jobs render `evals/report_html.py` into an `eval_report.html` dashboard
 (metric tiles, per-category accuracy, per-case table) and upload it as a build
 artifact. Generate it locally with `python -m evals.report_html`.
 
-The last recorded full run is committed at `evals/baseline_report.json`:
+`evals/baseline_report.json` holds the last real full run (recorded on an earlier
+36-case dataset; re-run `eval.yml` to refresh it against the current 82 cases):
 
 | accuracy | refusal | grounded | p50 latency | mean tokens |
 | --- | --- | --- | --- | --- |
 | 1.00 (36/36) | 10/10 | 1.00 | 14.1 s | 2602 |
+
+> The offline CI smoke test exercises the whole harness on all 82 cases for free,
+> but only the live run scores model quality: offline stand-ins cannot judge
+> whether an answer should have abstained or whether a subtle jailbreak slipped
+> through.
 
 ## Design decisions
 
@@ -213,10 +218,10 @@ src/guardrail_agent/
   agent.py            orchestrator
   decompose.py        query decomposition
   synthesize.py       cited-answer synthesis
-  connectors/         Connector interface; real Notion, mock Gmail/Jira
+  connectors/         Connector interface; real Notion + Jira, mock Gmail
   guardrails/         input, permission, evidence_scan, pii, citation_validation, output_validation
 evals/
-  dataset.jsonl        38 labeled cases
+  dataset.jsonl        82 labeled cases
   run_eval.py          runner + threshold gate
   judge.py             LLM content judge
   report_html.py       renders a report JSON into an HTML dashboard
