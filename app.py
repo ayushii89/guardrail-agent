@@ -246,11 +246,24 @@ def render(trace: AgentTrace) -> None:
     st.markdown(f'<div class="verdict {v}">{txt}{reason}</div>', unsafe_allow_html=True)
 
     passed = sum(1 for _, s, _, _ in _stage_states(trace) if s == "pass")
+    n_ev = len(trace.answer.evidence) if trace.answer else 0
+    n_sub = len(trace.decomposition.subquestions) if trace.decomposition else 0
+    if offline_enabled():
+        cost = (
+            '<div class="chip"><b>offline</b><span>canned responses, 0 tokens</span></div>'
+        )
+    else:
+        cost = (
+            f'<div class="chip"><b>{trace.latency_s:.1f}s</b><span>latency</span></div>'
+            f'<div class="chip"><b>{trace.total_tokens:,}</b>'
+            f'<span>tokens · in {trace.input_tokens:,} / out {trace.output_tokens:,}</span></div>'
+        )
     st.markdown(
         '<div class="stats">'
-        f'<div class="chip"><b>{trace.latency_s:.1f}s</b><span>latency</span></div>'
-        f'<div class="chip"><b>{trace.total_tokens:,}</b><span>tokens · in {trace.input_tokens:,} / out {trace.output_tokens:,}</span></div>'
-        f'<div class="chip"><b>{passed}/{N_STAGES}</b><span>stages passed</span></div>'
+        f"{cost}"
+        f'<div class="chip"><b>{passed}/{N_STAGES}</b><span>guardrail stages passed</span></div>'
+        f'<div class="chip"><b>{n_sub}</b><span>sub-questions</span></div>'
+        f'<div class="chip"><b>{n_ev}</b><span>evidence snippets</span></div>'
         "</div>",
         unsafe_allow_html=True,
     )
